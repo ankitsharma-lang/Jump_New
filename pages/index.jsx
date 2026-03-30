@@ -50,5 +50,7 @@ export async function getStaticProps() {
     props: {
       page: homepageEntry ? homepageEntry : {},
     },
+    revalidate: 30, // re-fetch at most once every 30 seconds
+
   };
 }
