@@ -9,7 +9,9 @@
         "lint": "next lint"
     },
     "dependencies": {
+        "@contentful/live-preview": "^4.10.8",
         "@contentful/rich-text-react-renderer": "^15.21.2",
+        "@contentful/timeline-preview": "^1.1.1",
         "@ninetailed/experience.js": "^7.21.3",
         "@ninetailed/experience.js-next": "^7.21.3",
         "@ninetailed/experience.js-plugin-insights": "^7.21.3",
