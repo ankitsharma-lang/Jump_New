@@ -7,6 +7,16 @@ export default async function handler(req, res) {
     return res.status(401).json({ message: 'Invalid token' })
   }
 
+  // Map Contentful slugs to actual Next.js routes
+  const routeMap = {
+    'home-page': '/',
+    'home-page-uk-hoodie-variant': '/',
+    'home': '/',
+  }
+
+  const safeSlug = routeMap[slug] || 
+    (slug.startsWith('/') ? slug : `/${slug}`)
+
   res.setPreviewData({ timeline })
-  res.redirect(slug)
+  res.redirect(safeSlug)
 }
