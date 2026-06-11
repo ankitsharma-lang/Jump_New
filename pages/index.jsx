@@ -52,17 +52,25 @@ export default function Home({ page }) {
 }
 
 
-export async function getStaticProps() {
-  const pageEntries = await getEntriesByContentType("landingPage", "home-page");
+export async function getStaticProps(context) {
+  const preview = context.preview || false
+  const timeline = context.previewData?.timeline || null
+
+  const pageEntries = await getEntriesByContentType(
+    "landingPage",
+    "home-page",
+    preview,      // ← uses preview client when in preview mode
+    timeline      // ← passes timeline token for Release preview
+  )
 
   const safeEntries = JSON.parse(
     JSON.stringify(pageEntries, (key, value) => {
       if (key === "page") return undefined;
       return value;
     })
-  );
+  )
 
-  const homepageEntry = _.get(safeEntries, "items[0]", {});
+  const homepageEntry = _.get(safeEntries, "items[0]", {})
 
   return {
     props: {
