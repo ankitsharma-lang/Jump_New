@@ -9,7 +9,10 @@ import { ContentfulLivePreviewProvider } from "@contentful/live-preview/react";
 const plugins = [new NinetailedInsightsPlugin()];
 
 function MyApp({ Component, pageProps }) {
-  const isPreview = pageProps.__N_PREVIEW || false
+  import { useRouter } from 'next/router'
+// inside MyApp function:
+const router = useRouter()
+const isPreview = router.isPreview
 
   return (
     <ContentfulLivePreviewProvider
