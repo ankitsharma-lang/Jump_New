@@ -1,5 +1,6 @@
 
 import MainLayout from "../layouts/MainLayout";
+import Link from "next/link";
 import "../styles/globals.css";
 import { NinetailedProvider } from "@ninetailed/experience.js-next";
 import { NinetailedInsightsPlugin } from "@ninetailed/experience.js-plugin-insights";
@@ -38,9 +39,9 @@ function MyApp({ Component, pageProps }) {
             zIndex: 9999,
           }}>
             Preview Mode active —{' '}
-            <a href="/api/disable-preview" style={{ textDecoration: 'underline', fontWeight: 'bold' }}>
-              Exit Preview
-            </a>
+            <Link href="/api/disable-preview" style={{ textDecoration: 'underline', fontWeight: 'bold' }}>
+             Exit Preview
+            </Link>
           </div>
         )}
         <MainLayout>
