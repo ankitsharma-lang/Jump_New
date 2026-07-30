@@ -1,58 +1,22 @@
-
-import MainLayout from "../layouts/MainLayout";
-import Link from "next/link";
-import "../styles/globals.css";
-import { NinetailedProvider } from "@ninetailed/experience.js-next";
-import { NinetailedInsightsPlugin } from "@ninetailed/experience.js-plugin-insights";
-import { ContentfulLivePreviewProvider } from "@contentful/live-preview/react";
-
-const plugins = [new NinetailedInsightsPlugin()];
+import MainLayout from "../layouts/MainLayout"
+import "../styles/globals.css"
+import { ContentfulLivePreviewProvider } from "@contentful/live-preview/react"
+import {
+  NextPagesAutoPageTracker,
+  OptimizationRoot,
+} from "../lib/optimization"
 
 function MyApp({ Component, pageProps }) {
-  import { useRouter } from 'next/router'
-// inside MyApp function:
-const router = useRouter()
-const isPreview = router.isPreview
-
   return (
-    <ContentfulLivePreviewProvider
-      locale="en-US"
-      enableInspectorMode={isPreview}
-      enableLiveUpdates={isPreview}
-      debugMode={isPreview}
-    >
-      <NinetailedProvider
-        clientId={process.env.NEXT_PUBLIC_CONTENTFUL_PERSONALIZATION_CLIENT_ID}
-        environment={
-          process.env.NEXT_PUBLIC_CONTENTFUL_PERSONALIZATION_ENVIRONMENT || "main"
-        }
-        plugins={plugins}
-        componentViewTrackingThreshold={2000}
-      >
-        {isPreview && (
-          <div style={{
-            background: '#f59e0b',
-            color: '#78350f',
-            textAlign: 'center',
-            padding: '8px',
-            fontSize: '14px',
-            fontWeight: '600',
-            position: 'sticky',
-            top: 0,
-            zIndex: 9999,
-          }}>
-            Preview Mode active —{' '}
-            <Link href="/api/disable-preview" style={{ textDecoration: 'underline', fontWeight: 'bold' }}>
-             Exit Preview
-            </Link>
-          </div>
-        )}
+    <ContentfulLivePreviewProvider locale="en-US">
+      <OptimizationRoot>
+        <NextPagesAutoPageTracker />
         <MainLayout>
           <Component {...pageProps} />
         </MainLayout>
-      </NinetailedProvider>
+      </OptimizationRoot>
     </ContentfulLivePreviewProvider>
   )
 }
 
-export default MyApp;
+export default MyApp

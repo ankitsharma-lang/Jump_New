@@ -1,4 +1,4 @@
 export default function handler(req, res) {
-  res.clearPreviewData()
+  res.setDraftMode({ enable: false })
   res.redirect('/')
 }

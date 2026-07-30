@@ -2,13 +2,13 @@ import { documentToReactComponents } from "@contentful/rich-text-react-renderer"
 import _ from "lodash";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { useNinetailed } from "@ninetailed/experience.js-next";
+import { useOptimizationActions } from "@contentful/optimization-nextjs/client";
 import richtextRenderOptions from "../lib/richtextRenderOptions";
 import ImageComponent from "./ImageComponent";
 
 const ProductCardComponent = (props) => {
   const router = useRouter();
-  const { track } = useNinetailed();
+  const { trackEvent } = useOptimizationActions();
 
   const id = _.get(props, "id");
   const productIndex = _.get(props, "productIndex");
@@ -29,20 +29,23 @@ const ProductCardComponent = (props) => {
   }
 
   const handleBuyClick = async () => {
-  // Adjust these checks to match your actual slugs
-  const slug = fields.slug;
-  const isMug = slug.includes("mug");
-  const eventName = isMug ? "mug_click" : "jacket_click";
+    // Adjust these checks to match your actual slugs
+    const slug = fields.slug;
+    const isMug = slug.includes("mug");
+    const eventName = isMug ? "mug_click" : "jacket_click";
 
-  console.log("NT click event:", eventName, slug); // debug
+    console.log("Optimization click event:", eventName, slug); // debug
 
-  await track(eventName, {
-    product: slug,
-    name: fields.title,
-  });
+    await trackEvent({
+      event: eventName,
+      properties: {
+        product: slug,
+        name: fields.title,
+      },
+    });
 
-  router.push(`/products/${slug}`);
-};
+    router.push(`/products/${slug}`);
+  };
 
   return (
     <div className="">
