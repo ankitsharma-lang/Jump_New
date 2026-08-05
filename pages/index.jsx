@@ -27,15 +27,13 @@ function LandingPage(page) {
           ? sections.map((section) => {
               const contentType = _.get(section, "sys.contentType.sys.id")
               const sectionId = _.get(section, "sys.id")
-              const fields = _.get(section, "fields")
               if (contentType === "productSection") {
                 return (
-                  <ProductSection
-                    key={sectionId}
-                    id={sectionId}
-                    fields={fields}
-                    sys={section.sys}
-                  />
+                  <OptimizedEntry key={sectionId} baselineEntry={section}>
+                    {(resolvedSection) => (
+                      <ProductSection entry={resolvedSection} />
+                    )}
+                  </OptimizedEntry>
                 )
               }
               return null

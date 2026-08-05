@@ -5,12 +5,15 @@
         "setup": "node setup.js",
         "dev": "next dev -p 9019",
         "build": "next build",
-        "start": "next start",
-        "lint": "next lint"
+        "start": "next start -p 9019",
+        "lint": "next lint",
+        "setup:optimization-lab": "node scripts/setup-optimization-lab.mjs",
+        "test:e2e": "npm run build && playwright test"
     },
     "dependencies": {
         "@contentful/live-preview": "^4.10.8",
         "@contentful/optimization-nextjs": "^1.1.0",
+        "@contentful/optimization-web-preview-panel": "^1.1.0",
         "@contentful/rich-text-react-renderer": "^15.21.2",
         "@contentful/timeline-preview": "^1.1.1",
         "contentful": "^10.12.2",
@@ -20,6 +23,7 @@
         "react-dom": "^18.3.1"
     },
     "devDependencies": {
+        "@playwright/test": "^1.54.2",
         "autoprefixer": "^10.4.19",
         "chalk": "^5.3.0",
         "contentful-import": "^9.4.56",

@@ -1,7 +1,10 @@
 export default async function handler(req, res) {
   const { secret, slug } = req.query
 
-  if (secret !== process.env.NEXT_PUBLIC_PREVIEW_SECRET) {
+  const previewSecret =
+    process.env.PREVIEW_SECRET || process.env.NEXT_PUBLIC_PREVIEW_SECRET
+
+  if (secret !== previewSecret) {
     return res.status(401).json({ message: "Invalid token" })
   }
 

@@ -3,15 +3,14 @@ import _ from "lodash";
 import Head from "next/head";
 import ImageComponent from "../../components/ImageComponent";
 import { getEntriesByContentType } from "../../lib/helpers";
+import { OptimizedEntry } from "../../lib/optimization";
 import richtextRenderOptions from "../../lib/richtextRenderOptions";
+import { useOptimizationContext } from "@contentful/optimization-nextjs/client";
 
-const ProductPage = (props) => {
-  console.log("static props", props);
-  const product = _.get(props, "product.items[0]");
-  const contentType = _.get(product, "sys.contentType.sys.id");
-  const productId = _.get(product, "sys.id");
+const ProductDetails = ({ product }) => {
   const fields = _.get(product, "fields");
   const title = _.get(product, "fields.title");
+
   return (
     <>
       <Head>
@@ -28,6 +27,21 @@ const ProductPage = (props) => {
         </div>
       </div>
     </>
+  );
+};
+
+const ProductPage = (props) => {
+  const { error } = useOptimizationContext();
+  const product = _.get(props, "product.items[0]");
+
+  if (!product?.sys?.id || error) {
+    return <ProductDetails product={product} />;
+  }
+
+  return (
+    <OptimizedEntry baselineEntry={product}>
+      {(resolvedProduct) => <ProductDetails product={resolvedProduct} />}
+    </OptimizedEntry>
   );
 };
 

@@ -16,3 +16,17 @@ a {
 * {
     box-sizing: border-box;
 }
+
+@layer components {
+    .lab-button {
+        @apply rounded bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700;
+    }
+
+    .lab-button-secondary {
+        @apply rounded bg-slate-200 px-4 py-2 text-sm font-semibold text-slate-900 hover:bg-slate-300;
+    }
+
+    .lab-button-danger {
+        @apply rounded bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700;
+    }
+}

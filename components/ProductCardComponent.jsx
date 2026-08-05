@@ -10,9 +10,8 @@ const ProductCardComponent = (props) => {
   const router = useRouter();
   const { trackEvent } = useOptimizationActions();
 
-  const id = _.get(props, "id");
   const productIndex = _.get(props, "productIndex");
-  const fields = _.get(props, "fields");
+  const fields = _.get(props, "entry.fields");
 
   const [indexIsOdd, setIndexIsOdd] = useState(false);
 
@@ -21,8 +20,6 @@ const ProductCardComponent = (props) => {
       setIndexIsOdd(true);
     }
   }, [productIndex]);
-
-  console.log("description field", fields?.description);
 
   if (!fields) {
     return "";
@@ -33,8 +30,6 @@ const ProductCardComponent = (props) => {
     const slug = fields.slug;
     const isMug = slug.includes("mug");
     const eventName = isMug ? "mug_click" : "jacket_click";
-
-    console.log("Optimization click event:", eventName, slug); // debug
 
     await trackEvent({
       event: eventName,
