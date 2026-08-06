@@ -52,14 +52,14 @@ const ProductCardComponent = (props) => {
     <div className="">
       <div className="flex flex-col space-y-10x lg:space-y-0x lg:space-x-10x lg:flex-row w-full p-6x lg:py-10x lg:px-40x overflow-hidden rounded-md shadow-lg">
         <div
-          className={`w-1/2 bg-blau9x bg-blau3 p-10 ${
+          className={`flex w-full items-center justify-center bg-blau9x bg-blau3 p-10 lg:w-1/2 ${
             indexIsOdd ? "order-last" : ""
           }`}
           {...inspectorProps({ fieldId: "image" })}
         >
           <ImageComponent image={fields.image} />
         </div>
-        <div className="w-1/2 bg-gelb p-10 flex flex-col items-center">
+        <div className="flex w-full flex-col items-center bg-gelb p-10 lg:w-1/2">
           <div className="h-1/3"></div>
           <div className="flex flex-col space-y-4">
             <h2
