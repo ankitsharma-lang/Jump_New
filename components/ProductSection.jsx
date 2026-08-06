@@ -1,9 +1,14 @@
 import _ from "lodash";
 import { OptimizedEntry } from "../lib/optimization";
 import ProductCardComponent from "./ProductCardComponent";
+import {
+  useContentfulInspectorMode,
+  useContentfulLiveUpdates,
+} from "@contentful/live-preview/react";
 
 const ProductSection = (props) => {
-  const entry = _.get(props, "entry");
+  const entry = useContentfulLiveUpdates(_.get(props, "entry"));
+  const inspectorProps = useContentfulInspectorMode({ entryId: entry?.sys?.id });
   const fields = _.get(entry, "fields");
   const title = _.get(fields, "title");
   const products = _.get(fields, "products");
@@ -15,23 +20,30 @@ const ProductSection = (props) => {
     <div className="">
       {/* {JSON.stringify(products)} */}
       <div className="bg-red-100x flex flex-col space-y-8 p-20 border-2 rounded-md shadow-md">
-        <h2 className="font-bold text-2xl text-center">{title}</h2>
+        <h2
+          className="font-bold text-2xl text-center"
+          {...inspectorProps({ fieldId: "title" })}
+        >
+          {title}
+        </h2>
 
-        {Array.isArray(products)
-          ? products.map((product, productIndex) => {
-              const productId = _.get(product, "sys.id");
-              return (
-                <OptimizedEntry key={productId} baselineEntry={product}>
-                  {(resolvedProduct) => (
-                    <ProductCardComponent
-                      productIndex={productIndex}
-                      entry={resolvedProduct}
-                    />
-                  )}
-                </OptimizedEntry>
-              );
-            })
-          : ""}
+        <div {...inspectorProps({ fieldId: "products" })}>
+          {Array.isArray(products)
+            ? products.map((product, productIndex) => {
+                const productId = _.get(product, "sys.id");
+                return (
+                  <OptimizedEntry key={productId} baselineEntry={product}>
+                    {(resolvedProduct) => (
+                      <ProductCardComponent
+                        productIndex={productIndex}
+                        entry={resolvedProduct}
+                      />
+                    )}
+                  </OptimizedEntry>
+                );
+              })
+            : ""}
+        </div>
       </div>
     </div>
   );

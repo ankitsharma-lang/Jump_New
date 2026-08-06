@@ -3,6 +3,10 @@ import _ from "lodash";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useOptimizationActions } from "@contentful/optimization-nextjs/client";
+import {
+  useContentfulInspectorMode,
+  useContentfulLiveUpdates,
+} from "@contentful/live-preview/react";
 import richtextRenderOptions from "../lib/richtextRenderOptions";
 import ImageComponent from "./ImageComponent";
 
@@ -11,7 +15,9 @@ const ProductCardComponent = (props) => {
   const { trackEvent } = useOptimizationActions();
 
   const productIndex = _.get(props, "productIndex");
-  const fields = _.get(props, "entry.fields");
+  const entry = useContentfulLiveUpdates(_.get(props, "entry"));
+  const inspectorProps = useContentfulInspectorMode({ entryId: entry?.sys?.id });
+  const fields = _.get(entry, "fields");
 
   const [indexIsOdd, setIndexIsOdd] = useState(false);
 
@@ -49,26 +55,38 @@ const ProductCardComponent = (props) => {
           className={`w-1/2 bg-blau9x bg-blau3 p-10 ${
             indexIsOdd ? "order-last" : ""
           }`}
+          {...inspectorProps({ fieldId: "image" })}
         >
           <ImageComponent image={fields.image} />
         </div>
         <div className="w-1/2 bg-gelb p-10 flex flex-col items-center">
           <div className="h-1/3"></div>
           <div className="flex flex-col space-y-4">
-            <h2 className="text-xl font-bold">{fields.title}</h2>
+            <h2
+              className="text-xl font-bold"
+              {...inspectorProps({ fieldId: "title" })}
+            >
+              {fields.title}
+            </h2>
 
-            <div>
+            <div {...inspectorProps({ fieldId: "description" })}>
               {documentToReactComponents(
                 fields.description,
                 richtextRenderOptions
               )}
             </div>
 
-            <p className="text-xl">${fields.price}</p>
+            <p
+              className="text-xl"
+              {...inspectorProps({ fieldId: "price" })}
+            >
+              ${fields.price}
+            </p>
 
             <button
               onClick={handleBuyClick}
               className="bg-black text-white hover:bg-neuter rounded shadow-md"
+              {...inspectorProps({ fieldId: "slug" })}
             >
               BUY
             </button>

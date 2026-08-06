@@ -1,7 +1,13 @@
-import { COOKIE_NAME_PRERENDER_BYPASS } from 'next/dist/server/api-utils'
+import {
+  addTimelineToPath,
+  getSafePreviewPath,
+  getTimelinePreviewConfig,
+  makePreviewCookiesIframeCompatible,
+  normalizeTimelineToken,
+} from '../../lib/contentful-preview.mjs'
 
 export default async function handler(req, res) {
-  const { secret, slug } = req.query
+  const { secret, slug, timeline: timelineValue } = req.query
 
   const previewSecret =
     process.env.PREVIEW_SECRET || process.env.NEXT_PUBLIC_PREVIEW_SECRET
@@ -10,26 +16,18 @@ export default async function handler(req, res) {
     return res.status(401).json({ message: 'Invalid token' })
   }
 
-  // Use setDraftMode (official) not setPreviewData
-  res.setDraftMode({ enable: true })
+  const timeline = normalizeTimelineToken(timelineValue)
 
-  // CRITICAL: patch cookie for Contentful iframe
-  // https://github.com/vercel/next.js/issues/49927
-  const headers = res.getHeader('Set-Cookie')
-  if (Array.isArray(headers)) {
-    res.setHeader(
-      'Set-Cookie',
-      headers.map((cookie) => {
-        if (cookie.includes(COOKIE_NAME_PRERENDER_BYPASS)) {
-          return cookie.replace('SameSite=Lax', 'SameSite=None; Secure')
-        }
-        return cookie
-      })
-    )
+  try {
+    getTimelinePreviewConfig(timeline)
+  } catch (error) {
+    return res.status(400).json({ message: error.message })
   }
 
-  // Map slug to route
-  const routeMap = { 'home-page': '/', 'home': '/' }
-  const safeSlug = routeMap[slug] || (slug?.startsWith('/') ? slug : `/${slug}`) || '/'
-  res.redirect(safeSlug)
+  // Preview data securely carries the Timeline token into getStaticProps.
+  res.setPreviewData({ timeline })
+
+  makePreviewCookiesIframeCompatible(res)
+
+  res.redirect(addTimelineToPath(getSafePreviewPath(slug), timeline))
 }

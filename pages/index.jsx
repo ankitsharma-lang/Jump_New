@@ -22,7 +22,10 @@ function LandingPage(page) {
       >
         {headline}
       </h1>
-      <div className="flex flex-col space-y-4">
+      <div
+        className="flex flex-col space-y-4"
+        {...inspectorProps({ fieldId: "sections" })}
+      >
         {Array.isArray(sections)
           ? sections.map((section) => {
               const contentType = _.get(section, "sys.contentType.sys.id")
@@ -58,9 +61,10 @@ export default function Home({ page }) {
   )
 }
 
-// OFFICIAL PATTERN: use context.draftMode not context.preview
 export async function getStaticProps(context) {
-  const preview = context.draftMode || false
+  // setPreviewData carries the Timeline token; draftMode remains supported for
+  // preview links that do not provide one.
+  const preview = Boolean(context.draftMode || context.preview)
   const timeline = context.previewData?.timeline || null
 
   const pageEntries = await getEntriesByContentType(
