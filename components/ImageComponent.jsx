@@ -1,5 +1,6 @@
 import _ from "lodash";
-import Image from "next/legacy/image";
+import Image from "next/image";
+import { buildContentfulImageUrl } from "../lib/contentful-image";
 
 const ImageComponent = (props) => {
   const image = _.get(props, "image");
@@ -10,15 +11,22 @@ const ImageComponent = (props) => {
     return "";
   }
 
+  const transformedUrl = buildContentfulImageUrl(imgUrl, {
+    width: 1200,
+    height: 1200,
+    fit: "pad",
+    format: "webp",
+    quality: 85,
+  });
+
   return (
-    <div className="w-full max-w-[520px] overflow-hidden">
+    <div className="relative aspect-square w-full overflow-hidden">
       <Image
-        src={`https:${imgUrl}?w=1200&fm=webp&q=85`}
-        width={1200}
-        height={1200}
-        layout="responsive"
-        objectFit="contain"
-        alt={imgAltText || "Product image"}
+        src={transformedUrl}
+        fill
+        sizes="(max-width: 768px) 100vw, 50vw"
+        className="object-contain"
+        alt={imgAltText || props.altFallback || ""}
       />
     </div>
   );

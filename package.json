@@ -8,6 +8,7 @@
         "start": "next start -p 9019",
         "lint": "next lint",
         "test:preview": "node scripts/test-contentful-preview.mjs",
+        "test:features": "node --experimental-default-type=module scripts/test-storefront-features.mjs",
         "setup:optimization-lab": "node scripts/setup-optimization-lab.mjs",
         "test:e2e": "npm run build && playwright test"
     },
@@ -27,8 +28,10 @@
         "@playwright/test": "^1.54.2",
         "autoprefixer": "^10.4.19",
         "chalk": "^5.3.0",
+        "contentful-cli": "^4.0.6",
         "contentful-import": "^9.4.56",
         "contentful-management": "^11.27.3",
+        "contentful-migration": "^5.1.0",
         "dotenv": "^16.4.5",
         "eslint": "^8.57.0",
         "eslint-config-next": "^14.2.4",

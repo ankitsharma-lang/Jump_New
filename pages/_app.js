@@ -6,20 +6,26 @@ import { OptimizationRoot } from "../lib/optimization"
 
 function MyApp({ Component, pageProps }) {
   const router = useRouter()
-  const routeKey = router.pathname
+  const locale = router.locale || "en-US"
+  const routeKey = `${locale}:${router.asPath.split("?")[0]}`
 
   return (
     <ContentfulLivePreviewProvider
-      locale="en-US"
+      locale={locale}
       enableInspectorMode={router.isPreview}
       enableLiveUpdates={router.isPreview}
     >
       <OptimizationRoot
-        buildPagePayload={() => ({ properties: { route: routeKey } })}
+        buildPagePayload={() => ({ properties: { route: routeKey, locale } })}
         handoff={pageProps.contentfulOptimization?.handoff}
         routeKey={routeKey}
       >
-        <MainLayout>
+        <MainLayout
+          localeOptions={pageProps.localeOptions}
+          previewStatus={pageProps.previewStatus}
+          previewWorkspace={pageProps.previewWorkspace}
+          siteSettings={pageProps.siteSettings}
+        >
           <Component {...pageProps} />
         </MainLayout>
       </OptimizationRoot>

@@ -1,24 +1,50 @@
-# Jumpstart shop demo
+# Jumpstart storefront
 
-# Requirements
+A public Next.js storefront for troubleshooting Contentful delivery, Live Preview,
+Inspector Mode, Timeline Preview, localization, the Images API, and Contentful
+Optimization.
 
- - Node.js
- - Contentful API access tokens
- - Empty Contentful Space
- - Contentful CLI tools
+## Run locally
 
-# Step 1
+1. Install Node.js 20 or newer.
+2. Copy the required Contentful and Optimization variables into `.env`.
+3. Install dependencies with `npm install`.
+4. Start the website with `npm run dev`.
+5. Open `http://localhost:9019`.
 
-Create an empty space in Contentful if you haven't already. 
-Create your first API key and note the API access tokens (Delivery and Preview).
-From the Contentful web app go to  SPACE SETTINGS --> API keys....
+The local source code is in `/Users/ankit.sharma/Documents/Jump_New`.
 
-# Step 2
-After downloading/cloning this repo, navigate to the project's directory on your computer and run "npm install" from your terminal window to install the dependencies.
+## Content ownership
 
-# Step 3
-After installing the dependencies run the "npm run setup" command to configure the app.
-Type in the API tokens from step 1 at the prompt. The script will connect to the provided space, please use a demo space as the script will DELETE all entries and content types. I repeat the script will WIPE! the space clean before importing new content.
+Public editorial content is managed in the Contentful Web App:
 
-# Step 4
-Run the app with "npm run dev". The app will now be running locally on port 9019, you may also change the port in the package.json file.
+- site name, navigation, footer, shared labels, and currency;
+- home-page hero, SEO text, feature highlights, and product sections;
+- product and category titles, descriptions, images, prices, and SEO text;
+- English (`en-US`) and Deutsch (`de-DE`) field values;
+- Optimization audiences, experiences, and variants.
+
+Code owns application behavior that editors should not change: routes, API security,
+preview controls, analytics event names, supported locale codes, responsive image
+parameters, and visual styling. See [docs/contentful-content-model.md](docs/contentful-content-model.md)
+for the complete boundary and editor workflow.
+
+## Validation
+
+```bash
+npm run lint
+npm run test:preview
+npm run test:features
+npm run build
+```
+
+## Safe content-model changes
+
+Do not run the legacy `npm run setup` command against an existing space; it was
+created for importing the original demo into an empty space.
+
+The current additive migration is `migrations/03-cms-managed-storefront.js`.
+Always apply and test it in a cloned environment first, then promote the same
+migration to the live environment. The idempotent content seed is
+`scripts/setup-storefront-content.mjs` and selects its target through
+`CONTENTFUL_MIGRATION_ENVIRONMENT`.
