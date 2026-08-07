@@ -1,13 +1,15 @@
 import {
+  addLocaleToPath,
   addTimelineToPath,
   getSafePreviewPath,
   getTimelinePreviewConfig,
   makePreviewCookiesIframeCompatible,
   normalizeTimelineToken,
 } from "../../lib/contentful-preview.mjs"
+import siteLocales from "../../config/locales"
 
 export default async function handler(req, res) {
-  const { secret, slug, timeline: timelineValue } = req.query
+  const { locale, secret, slug, timeline: timelineValue } = req.query
 
   const previewSecret =
     process.env.PREVIEW_SECRET || process.env.NEXT_PUBLIC_PREVIEW_SECRET
@@ -28,5 +30,6 @@ export default async function handler(req, res) {
 
   makePreviewCookiesIframeCompatible(res)
 
-  res.redirect(addTimelineToPath(getSafePreviewPath(slug), timeline))
+  const previewPath = addLocaleToPath(getSafePreviewPath(slug), locale, siteLocales)
+  res.redirect(addTimelineToPath(previewPath, timeline))
 }

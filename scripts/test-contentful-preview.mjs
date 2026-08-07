@@ -1,5 +1,6 @@
 import assert from "node:assert/strict"
 import {
+  addLocaleToPath,
   addTimelineToPath,
   getSafePreviewPath,
   getPreviewStatus,
@@ -34,6 +35,34 @@ assert.deepEqual(
 assert.throws(() => getTimelinePreviewConfig("release-123;not-a-date"))
 assert.equal(getSafePreviewPath("home-page"), "/")
 assert.equal(getSafePreviewPath("//example.com"), "/")
+assert.equal(
+  addLocaleToPath("/", "de-DE", {
+    defaultLocale: "en-US",
+    locales: ["en-US", "de-DE"],
+  }),
+  "/de-DE"
+)
+assert.equal(
+  addLocaleToPath("/products/mug?preview=true", "de-DE", {
+    defaultLocale: "en-US",
+    locales: ["en-US", "de-DE"],
+  }),
+  "/de-DE/products/mug?preview=true"
+)
+assert.equal(
+  addLocaleToPath("/", "en-US", {
+    defaultLocale: "en-US",
+    locales: ["en-US", "de-DE"],
+  }),
+  "/"
+)
+assert.equal(
+  addLocaleToPath("/", "de-DE/../../admin", {
+    defaultLocale: "en-US",
+    locales: ["en-US", "de-DE"],
+  }),
+  "/"
+)
 assert.equal(
   addTimelineToPath("/", "release-123;2026-08-05T10:00:00.000Z"),
   "/?timeline=release-123%3B2026-08-05T10%3A00%3A00.000Z"
