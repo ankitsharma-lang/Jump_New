@@ -29,6 +29,8 @@ preview controls, analytics event names, supported locale codes, responsive imag
 parameters, and visual styling. See [docs/contentful-content-model.md](docs/contentful-content-model.md)
 for the complete boundary and editor workflow.
 
+All changes must also follow [docs/clean-code-policy.md](docs/clean-code-policy.md).
+
 ## Validation
 
 ```bash
@@ -41,10 +43,10 @@ npm run test:e2e
 
 ## Personalization runtime
 
-Personalized routes use request-scoped server rendering. The server passes the trusted
-Vercel visitor IP to Contentful Optimization, creates a private request handoff, and
-hydrates the browser with the same selection. Personalized HTML must never use a shared
-CDN or ISR cache.
+Personalized routes use request-scoped server rendering. The server passes Vercel's
+request geolocation to Contentful Optimization through the SDK's supported event
+context, creates a private request handoff, and hydrates the browser with the same
+selection. Personalized HTML must never use a shared CDN or ISR cache.
 
 The troubleshooting lab is always disabled on the production Vercel deployment. Any
 future lab deployment must use a separate domain, Contentful environment, and

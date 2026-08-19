@@ -7,6 +7,7 @@ import {
   createRelationshipTree,
 } from "../lib/contentful-diagnostics.js"
 import { buildContentfulImageUrl } from "../lib/contentful-image.js"
+import { getLinkedOptimizationExperienceIds } from "../lib/optimization-experiences.js"
 import {
   getRevalidationPaths,
   getWebhookSlugs,
@@ -84,6 +85,31 @@ assert.deepEqual(coverage.find((row) => row.fieldId === "title").availability, {
   "de-DE": true,
 })
 
+assert.deepEqual(
+  getLinkedOptimizationExperienceIds({
+    sys: { id: "page", type: "Entry" },
+    fields: {
+      nt_experiences: [
+        {
+          sys: { id: "experience-entry", type: "Entry" },
+          fields: { nt_experience_id: "optimization-experience" },
+        },
+      ],
+      sections: [
+        {
+          sys: { id: "section", type: "Entry" },
+          fields: {
+            nt_experiences: [
+              { sys: { id: "nested-experience", type: "Entry" }, fields: {} },
+            ],
+          },
+        },
+      ],
+    },
+  }).sort(),
+  ["experience-entry", "nested-experience", "optimization-experience"]
+)
+
 const personalizedRouteSources = await Promise.all([
   readFile(new URL("../pages/index.jsx", import.meta.url), "utf8"),
   readFile(new URL("../pages/products/[slug].jsx", import.meta.url), "utf8"),
@@ -105,7 +131,9 @@ assert.equal(optimizationServerSource.includes('scope: "private-request"'), true
 assert.equal(optimizationServerSource.includes('hydration: "preserve-server"'), true)
 assert.equal(optimizationServerSource.includes("experienceOptions"), true)
 
-const { getRequestIp } = await import("../lib/optimization-request.js")
+const { getRequestGeoLocation, getRequestIp } = await import(
+  "../lib/optimization-request.js"
+)
 assert.equal(
   getRequestIp({
     req: {
@@ -117,6 +145,35 @@ assert.equal(
 )
 assert.equal(
   getRequestIp({ req: { headers: { "x-forwarded-for": "not-an-ip" }, socket: {} } }),
+  undefined
+)
+assert.deepEqual(
+  getRequestGeoLocation({
+    req: {
+      headers: {
+        "x-vercel-ip-country": "gb",
+        "x-vercel-ip-city": "Greater%20London",
+        "x-vercel-ip-latitude": "51.5072",
+        "x-vercel-ip-longitude": "-0.1276",
+      },
+    },
+  }),
+  {
+    countryCode: "GB",
+    city: "Greater London",
+    coordinates: { latitude: 51.5072, longitude: -0.1276 },
+  }
+)
+assert.deepEqual(
+  getRequestGeoLocation({
+    req: { headers: { "x-vercel-ip-country": "US" } },
+  }),
+  { countryCode: "US" }
+)
+assert.equal(
+  getRequestGeoLocation({
+    req: { headers: { "x-vercel-ip-country": "invalid" } },
+  }),
   undefined
 )
 

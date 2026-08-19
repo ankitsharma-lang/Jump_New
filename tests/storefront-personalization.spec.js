@@ -13,7 +13,8 @@ test("customer homepage is request-rendered and private", async ({ page }) => {
 test("a clean UK request is rendered with only the UK collection", async ({ browser }) => {
   const context = await browser.newContext({
     extraHTTPHeaders: {
-      "x-forwarded-for": "81.2.69.142",
+      "x-vercel-ip-country": "GB",
+      "x-vercel-ip-city": "London",
     },
   })
   const page = await context.newPage()
@@ -22,6 +23,25 @@ test("a clean UK request is rendered with only the UK collection", async ({ brow
 
   await expect(page.getByRole("heading", { name: "UK Collection" })).toBeVisible()
   await expect(page.getByRole("heading", { name: "All Users Collection" })).toHaveCount(0)
+  await expect(page.getByText("Personalized for this visit", { exact: true })).toBeVisible()
+  await context.close()
+})
+
+test("a clean non-UK request never renders the UK collection", async ({ browser }) => {
+  const context = await browser.newContext({
+    extraHTTPHeaders: {
+      "x-vercel-ip-country": "US",
+      "x-vercel-ip-city": "New York",
+    },
+  })
+  const page = await context.newPage()
+
+  await page.goto("/")
+
+  await expect(page.getByText("All Users Collection", { exact: true })).toBeVisible()
+  await expect(page.getByText("UK Collection", { exact: true })).toHaveCount(0)
+  await expect(page.getByText("Curated storefront", { exact: true })).toBeVisible()
+
   await context.close()
 })
 

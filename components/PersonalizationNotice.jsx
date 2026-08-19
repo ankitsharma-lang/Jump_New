@@ -1,12 +1,19 @@
 import { useSelectedOptimizationsState } from "@contentful/optimization-nextjs/client"
 
-export default function PersonalizationNotice({ baselineLabel, personalizedLabel }) {
+export default function PersonalizationNotice({
+  baselineLabel,
+  experienceIds = [],
+  personalizedLabel,
+}) {
   const selectedOptimizations = useSelectedOptimizationsState()
+  const linkedExperienceIds = new Set(experienceIds)
   const selections = Array.isArray(selectedOptimizations)
     ? selectedOptimizations
     : Object.values(selectedOptimizations || {})
   const hasAuthoredVariant = selections.some(
-    (selection) => Number(selection?.variantIndex) > 0
+    (selection) =>
+      linkedExperienceIds.has(selection?.experienceId) &&
+      Number(selection?.variantIndex) > 0
   )
 
   return (

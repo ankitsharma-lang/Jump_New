@@ -4,11 +4,16 @@ import { ContentfulLivePreviewProvider } from "@contentful/live-preview/react"
 import { useRouter } from "next/router"
 import { useEffect } from "react"
 import { OptimizationRoot } from "../lib/optimization"
+import { getLinkedOptimizationExperienceIds } from "../lib/optimization-experiences"
 
 function MyApp({ Component, pageProps }) {
   const router = useRouter()
   const locale = router.locale || "en-US"
   const routeKey = `${locale}:${router.asPath.split("?")[0]}`
+  const linkedOptimizationExperienceIds = getLinkedOptimizationExperienceIds(
+    pageProps.page,
+    pageProps.product
+  )
 
   useEffect(() => {
     if (!router.isReady || pageProps.previewStatus?.enabled) return
@@ -36,6 +41,7 @@ function MyApp({ Component, pageProps }) {
         routeKey={routeKey}
       >
         <MainLayout
+          linkedOptimizationExperienceIds={linkedOptimizationExperienceIds}
           localeOptions={pageProps.localeOptions}
           previewStatus={pageProps.previewStatus}
           previewWorkspace={pageProps.previewWorkspace}

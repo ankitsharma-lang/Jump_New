@@ -60,6 +60,7 @@ const MainLayout = (props) => {
 
           <PersonalizationNotice
             baselineLabel={settings.baselineLabel}
+            experienceIds={props.linkedOptimizationExperienceIds}
             personalizedLabel={settings.personalizedLabel}
           />
           <LocaleSwitcher
