@@ -108,6 +108,7 @@ function LandingPage({ baselineEntry, entry, locale = siteLocales.defaultLocale,
                       <ProductSection
                         baselineEntry={section}
                         entry={resolvedSection}
+                        key={resolvedSection?.sys?.id || sectionId}
                         siteSettings={siteSettings}
                       />
                     )}
@@ -142,6 +143,7 @@ export default function Home({ locale, page, siteSettings }) {
         <LandingPage
           baselineEntry={page}
           entry={resolvedPage}
+          key={resolvedPage?.sys?.id || page.sys.id}
           locale={locale}
           siteSettings={siteSettings}
         />

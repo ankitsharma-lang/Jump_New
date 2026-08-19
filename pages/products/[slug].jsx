@@ -147,6 +147,7 @@ const ProductPage = ({ product, siteSettings }) => {
       {(resolvedProduct) => (
         <ProductDetails
           baselineProduct={product}
+          key={resolvedProduct?.sys?.id || product.sys.id}
           product={resolvedProduct}
           siteSettings={siteSettings}
         />

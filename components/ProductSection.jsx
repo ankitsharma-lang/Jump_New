@@ -54,8 +54,9 @@ const ProductSection = (props) => {
                     {(resolvedProduct) => (
                       <ProductCardComponent
                         baselineEntry={product}
-                        productIndex={productIndex}
                         entry={resolvedProduct}
+                        key={resolvedProduct?.sys?.id || productId}
+                        productIndex={productIndex}
                         settings={settings}
                       />
                     )}
