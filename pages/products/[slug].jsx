@@ -17,11 +17,11 @@ import {
 import { getPreviewStatus } from "../../lib/contentful-preview.mjs"
 import {
   getContentfulEnvironment,
-  getEntriesByContentType,
   getEntryByIdAllLocales,
   getLocalizedEntryBySlug,
 } from "../../lib/helpers"
 import { OptimizedEntry } from "../../lib/optimization"
+import { getSafeStorefrontOptimizationHandoff } from "../../lib/optimization-server"
 import richtextRenderOptions from "../../lib/richtextRenderOptions"
 import { getSiteContent } from "../../lib/site-content"
 
@@ -39,8 +39,8 @@ const ProductDetails = ({ baselineProduct, product, siteSettings }) => {
     maximumFractionDigits: 0,
   }).format(fields.price || 0)
 
-  const trackProductAction = () =>
-    trackEvent({
+  const trackProductAction = () => {
+    void trackEvent({
       event: "add_to_cart",
       properties: {
         product: fields.slug,
@@ -48,7 +48,10 @@ const ProductDetails = ({ baselineProduct, product, siteSettings }) => {
         price: fields.price,
         source: "product-detail",
       },
+    }).catch((error) => {
+      console.warn("Optimization tracking failed", error?.name || "")
     })
+  }
 
   return (
     <>
@@ -154,27 +157,14 @@ const ProductPage = ({ product, siteSettings }) => {
   )
 }
 
-export async function getStaticPaths() {
-  const productEntries = await getEntriesByContentType("product")
-  const products = productEntries?.items || []
-  const paths = products.flatMap((entry) => {
-    const slug = _.get(entry, "fields.slug")
-    if (!slug) return []
-    return siteLocales.locales.map((locale) => ({ params: { slug }, locale }))
-  })
-
-  return {
-    paths,
-    fallback: "blocking",
-  }
-}
-
-export async function getStaticProps(context) {
+export async function getServerSideProps(context) {
   const slug = _.get(context, "params.slug")
   const preview = Boolean(context.draftMode || context.preview)
   const timeline = context.previewData?.timeline || null
   const locale = context.locale || siteLocales.defaultLocale
-  const [productEntries, siteContent] = await Promise.all([
+  context.res.setHeader("Cache-Control", "private, no-store, max-age=0")
+
+  const [productEntries, siteContent, optimizationHandoff] = await Promise.all([
     getLocalizedEntryBySlug(
       "product",
       slug,
@@ -184,11 +174,15 @@ export async function getStaticProps(context) {
       siteLocales.defaultLocale
     ),
     getSiteContent({ locale, preview, timeline }),
+    getSafeStorefrontOptimizationHandoff(context, {
+      locale,
+      route: context.resolvedUrl,
+    }),
   ])
   const product = _.get(productEntries, "items[0]")
 
   if (!product?.sys?.id) {
-    return { notFound: true, revalidate: 30 }
+    return { notFound: true }
   }
 
   let previewWorkspace = null
@@ -233,11 +227,13 @@ export async function getStaticProps(context) {
     props: sanitizeContentful({
       locale,
       product,
+      contentfulOptimization: optimizationHandoff
+        ? { handoff: optimizationHandoff }
+        : null,
       ...siteContent,
       previewStatus,
       previewWorkspace,
     }),
-    revalidate: 30,
   }
 }
 

@@ -6,16 +6,26 @@ const { createClient } = contentfulManagement
 const locale = "en-US"
 const contentTypeId = "optimizationTestCard"
 const spaceId = process.env.CONTENTFUL_SPACE_ID || process.env.NEXT_PUBLIC_SPACE_ID
-const environmentId =
+const environmentId = process.env.OPTIMIZATION_LAB_CONTENTFUL_ENVIRONMENT
+const storefrontEnvironment =
   process.env.CONTENTFUL_ENVIRONMENT || process.env.NEXT_PUBLIC_ENVIRONMENT || "master"
 const managementToken = process.env.CONTENTFUL_MANAGEMENT_TOKEN || process.env.CMA_TOKEN
 const primaryMetric =
   process.env.OPTIMIZATION_LAB_PRIMARY_METRIC_ID ||
   "56a145de-43a4-4ef0-ae1a-9345551bf4df"
 
-if (!spaceId || !managementToken) {
+if (!spaceId || !managementToken || !environmentId) {
   throw new Error(
-    "Missing Contentful credentials. Set CONTENTFUL_SPACE_ID (or NEXT_PUBLIC_SPACE_ID) and CONTENTFUL_MANAGEMENT_TOKEN (or CMA_TOKEN)."
+    "Missing isolated lab configuration. Set CONTENTFUL_SPACE_ID, CONTENTFUL_MANAGEMENT_TOKEN, and OPTIMIZATION_LAB_CONTENTFUL_ENVIRONMENT."
+  )
+}
+
+if (
+  environmentId === storefrontEnvironment &&
+  process.env.ALLOW_SHARED_OPTIMIZATION_LAB_ENVIRONMENT !== "true"
+) {
+  throw new Error(
+    "Refusing to install lab fixtures into the storefront Contentful environment. Use a dedicated OPTIMIZATION_LAB_CONTENTFUL_ENVIRONMENT."
   )
 }
 

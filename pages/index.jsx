@@ -12,6 +12,7 @@ import {
   getLocalizedEntryBySlug,
 } from "../lib/helpers"
 import { OptimizedEntry } from "../lib/optimization"
+import { getSafeStorefrontOptimizationHandoff } from "../lib/optimization-server"
 import { getSiteContent } from "../lib/site-content"
 import { getPreviewStatus } from "../lib/contentful-preview.mjs"
 import {
@@ -149,14 +150,16 @@ export default function Home({ locale, page, siteSettings }) {
   )
 }
 
-export async function getStaticProps(context) {
+export async function getServerSideProps(context) {
   // setPreviewData carries the Timeline token; draftMode remains supported for
   // preview links that do not provide one.
   const preview = Boolean(context.draftMode || context.preview)
   const timeline = context.previewData?.timeline || null
   const locale = context.locale || siteLocales.defaultLocale
 
-  const [pageEntries, siteContent] = await Promise.all([
+  context.res.setHeader("Cache-Control", "private, no-store, max-age=0")
+
+  const [pageEntries, siteContent, optimizationHandoff] = await Promise.all([
     getLocalizedEntryBySlug(
       "landingPage",
       "home-page",
@@ -166,6 +169,10 @@ export async function getStaticProps(context) {
       siteLocales.defaultLocale
     ),
     getSiteContent({ locale, preview, timeline }),
+    getSafeStorefrontOptimizationHandoff(context, {
+      locale,
+      route: context.resolvedUrl,
+    }),
   ])
   const homepageEntry = _.get(pageEntries, "items[0]", {})
   let previewWorkspace = null
@@ -211,10 +218,12 @@ export async function getStaticProps(context) {
     props: sanitizeContentful({
       locale,
       page: homepageEntry,
+      contentfulOptimization: optimizationHandoff
+        ? { handoff: optimizationHandoff }
+        : null,
       ...siteContent,
       previewStatus,
       previewWorkspace,
     }),
-    revalidate: 30,
   }
 }

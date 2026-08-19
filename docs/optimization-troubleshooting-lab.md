@@ -1,15 +1,15 @@
 # Contentful Optimization troubleshooting lab
 
-This project now has a protected support page at `/optimization-lab`. It is deliberately separate from the shop pages, uses `noindex,nofollow`, disables shared caching, and does not change the existing home-page or product experiences.
+This project contains an optional support page at `/optimization-lab`. It is disabled unconditionally on the production Vercel deployment and must never share the storefront Contentful or Optimization environments.
 
 ## Opening the lab
 
-Set `OPTIMIZATION_LAB_SECRET` in Vercel for the environments where the lab should be available. If it is not set, the route safely falls back to the existing `PREVIEW_SECRET` or `NEXT_PUBLIC_PREVIEW_SECRET`.
+The lab is available automatically in local development. A separate non-production deployment must set both `OPTIMIZATION_LAB_ISOLATED_DEPLOYMENT=true` and `OPTIMIZATION_LAB_SECRET`. Preview secrets are deliberately not accepted.
 
 For the first visit, open:
 
 ```text
-https://YOUR-DOMAIN/optimization-lab?secret=YOUR_SECRET
+https://YOUR-ISOLATED-LAB-DOMAIN/optimization-lab?secret=YOUR_SECRET
 ```
 
 The server verifies the secret, stores only a one-way hash in a secure, HTTP-only cookie, and redirects to the clean `/optimization-lab` URL. The cookie lasts eight hours. An invalid or missing secret returns a normal 404 so the support page is not advertised publicly.
@@ -17,7 +17,7 @@ The server verifies the secret, stores only a one-way hash in a secure, HTTP-onl
 For local use:
 
 ```bash
-http://localhost:9019npm start
+npm run dev
 ```
 
 Then open `http://localhost:9019/optimization-lab?secret=YOUR_SECRET`.
@@ -110,7 +110,7 @@ Then open `http://localhost:9019/optimization-lab?secret=YOUR_SECRET`.
 
 ## Contentful fixtures
 
-Run `npm run setup:optimization-lab` to idempotently create or repair only the support fixtures. It creates the `optimizationTestCard` content type, baselines, variants, audience, merge tags, and four experiences. It publishes in the safe order: variants, audience and merge tags, experiences, then baselines.
+Run `npm run setup:optimization-lab` only with `OPTIMIZATION_LAB_CONTENTFUL_ENVIRONMENT` pointing to a dedicated non-storefront environment. The script refuses to use the configured storefront environment unless the explicit emergency override `ALLOW_SHARED_OPTIMIZATION_LAB_ENVIRONMENT=true` is present. It creates the `optimizationTestCard` content type, baselines, variants, audience, merge tags, and four experiences, publishing in the safe order: variants, audience and merge tags, experiences, then baselines.
 
 The script does not delete or edit the existing shop experiences. The primary metric can be overridden with `OPTIMIZATION_LAB_PRIMARY_METRIC_ID`.
 

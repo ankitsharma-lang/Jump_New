@@ -1,8 +1,11 @@
 import Head from "next/head"
 import OptimizationLab from "../components/optimization-lab/OptimizationLab"
 import { getEntriesByContentType } from "../lib/helpers"
-import { authorizeOptimizationLab } from "../lib/optimization-lab-server"
-import { resolveOptimizationLabOnServer } from "../lib/optimization-server"
+import {
+  authorizeOptimizationLab,
+  isOptimizationLabEnabled,
+} from "../lib/optimization-lab-server"
+import { resolveOptimizationLabOnServer } from "../lib/optimization-lab-runtime"
 
 function sanitizeContentful(value) {
   return JSON.parse(
@@ -26,6 +29,10 @@ export default function OptimizationLabPage(props) {
 }
 
 export async function getServerSideProps(context) {
+  if (!isOptimizationLabEnabled()) {
+    return { notFound: true }
+  }
+
   const access = authorizeOptimizationLab(context)
 
   if (!access.authorized) {

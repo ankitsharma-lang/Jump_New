@@ -4,9 +4,7 @@ const dotenv = require("dotenv")
 dotenv.config()
 
 const labSecret =
-  process.env.OPTIMIZATION_LAB_SECRET ||
-  process.env.PREVIEW_SECRET ||
-  process.env.NEXT_PUBLIC_PREVIEW_SECRET
+  process.env.OPTIMIZATION_LAB_SECRET
 
 module.exports = defineConfig({
   testDir: "./tests",

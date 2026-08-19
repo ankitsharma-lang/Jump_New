@@ -29,15 +29,19 @@ const ProductCardComponent = (props) => {
     const isMug = slug.includes("mug");
     const eventName = isMug ? "mug_click" : "jacket_click";
 
-    await trackEvent({
-      event: eventName,
-      properties: {
-        product: slug,
-        name: fields.title,
-      },
-    });
-
-    router.push(`/products/${slug}`);
+    try {
+      await trackEvent({
+        event: eventName,
+        properties: {
+          product: slug,
+          name: fields.title,
+        },
+      });
+    } catch (error) {
+      console.warn("Optimization tracking failed before navigation", error?.name || "");
+    } finally {
+      await router.push(`/products/${slug}`);
+    }
   };
 
   const price = new Intl.NumberFormat(router.locale || "en-US", {

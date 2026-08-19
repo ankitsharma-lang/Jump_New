@@ -1,4 +1,5 @@
 import assert from "node:assert/strict"
+import "dotenv/config"
 import { readFile } from "node:fs/promises"
 import {
   createContentSnapshot,
@@ -91,6 +92,56 @@ const personalizedRouteSources = await Promise.all([
 personalizedRouteSources.forEach((source) => {
   assert.equal(source.includes("useOptimizationContext"), false)
   assert.equal(source.includes("<OptimizedEntry"), true)
+  assert.equal(source.includes("getServerSideProps"), true)
+  assert.equal(source.includes("getStaticProps"), false)
+  assert.equal(source.includes("revalidate: 30"), false)
 })
+
+const optimizationServerSource = await readFile(
+  new URL("../lib/optimization-server.js", import.meta.url),
+  "utf8"
+)
+assert.equal(optimizationServerSource.includes('scope: "private-request"'), true)
+assert.equal(optimizationServerSource.includes('hydration: "preserve-server"'), true)
+assert.equal(optimizationServerSource.includes("experienceOptions"), true)
+
+const { getRequestIp } = await import("../lib/optimization-request.js")
+assert.equal(
+  getRequestIp({
+    req: {
+      headers: { "x-vercel-forwarded-for": "81.2.69.142, 10.0.0.1" },
+      socket: {},
+    },
+  }),
+  "81.2.69.142"
+)
+assert.equal(
+  getRequestIp({ req: { headers: { "x-forwarded-for": "not-an-ip" }, socket: {} } }),
+  undefined
+)
+
+const { resolveServerConsent } = await import("../lib/optimization-consent.js")
+assert.deepEqual(resolveServerConsent("granted"), {
+  events: true,
+  persistence: true,
+})
+assert.deepEqual(resolveServerConsent("session"), {
+  events: true,
+  persistence: false,
+})
+assert.deepEqual(resolveServerConsent("denied"), {
+  events: false,
+  persistence: false,
+})
+
+const previousVercelEnvironment = process.env.VERCEL_ENV
+process.env.VERCEL_ENV = "production"
+const { isOptimizationLabEnabled } = await import("../lib/optimization-lab-server.js")
+assert.equal(isOptimizationLabEnabled(), false)
+if (previousVercelEnvironment === undefined) {
+  delete process.env.VERCEL_ENV
+} else {
+  process.env.VERCEL_ENV = previousVercelEnvironment
+}
 
 console.log("Storefront feature checks passed")

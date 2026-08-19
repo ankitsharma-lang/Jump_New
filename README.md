@@ -7,7 +7,7 @@ Optimization.
 ## Run locally
 
 1. Install Node.js 20 or newer.
-2. Copy the required Contentful and Optimization variables into `.env`.
+2. Copy `.env.example` to `.env` and add the required Contentful and Optimization values.
 3. Install dependencies with `npm install`.
 4. Start the website with `npm run dev`.
 5. Open `http://localhost:9019`.
@@ -36,7 +36,19 @@ npm run lint
 npm run test:preview
 npm run test:features
 npm run build
+npm run test:e2e
 ```
+
+## Personalization runtime
+
+Personalized routes use request-scoped server rendering. The server passes the trusted
+Vercel visitor IP to Contentful Optimization, creates a private request handoff, and
+hydrates the browser with the same selection. Personalized HTML must never use a shared
+CDN or ISR cache.
+
+The troubleshooting lab is always disabled on the production Vercel deployment. Any
+future lab deployment must use a separate domain, Contentful environment, and
+Optimization environment.
 
 ## Safe content-model changes
 
