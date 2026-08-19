@@ -1,11 +1,12 @@
 import {
   addLocaleToPath,
-  addTimelineToPath,
+  addSignedPreviewToPath,
   getSafePreviewPath,
   getTimelinePreviewConfig,
   makePreviewCookiesIframeCompatible,
   normalizeTimelineToken,
 } from "../../lib/contentful-preview.mjs"
+import { createPreviewSignature } from "../../lib/contentful-preview-signature.mjs"
 import siteLocales from "../../config/locales"
 
 export default async function handler(req, res) {
@@ -14,7 +15,7 @@ export default async function handler(req, res) {
   const previewSecret =
     process.env.PREVIEW_SECRET || process.env.NEXT_PUBLIC_PREVIEW_SECRET
 
-  if (secret !== previewSecret) {
+  if (!previewSecret || secret !== previewSecret) {
     return res.status(401).json({ message: "Invalid token" })
   }
 
@@ -31,5 +32,11 @@ export default async function handler(req, res) {
   makePreviewCookiesIframeCompatible(res)
 
   const previewPath = addLocaleToPath(getSafePreviewPath(slug), locale, siteLocales)
-  res.redirect(addTimelineToPath(previewPath, timeline))
+  const previewKey = createPreviewSignature({
+    path: previewPath,
+    timeline,
+    secret: previewSecret,
+  })
+
+  res.redirect(addSignedPreviewToPath(previewPath, timeline, previewKey))
 }

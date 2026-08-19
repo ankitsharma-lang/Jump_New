@@ -1,12 +1,18 @@
 import assert from "node:assert/strict"
 import {
   addLocaleToPath,
+  addSignedPreviewToPath,
   addTimelineToPath,
   getSafePreviewPath,
   getPreviewStatus,
   getTimelinePreviewConfig,
   makePreviewCookiesIframeCompatible,
 } from "../lib/contentful-preview.mjs"
+import {
+  createPreviewSignature,
+  normalizeSignedPreviewPath,
+  verifyPreviewSignature,
+} from "../lib/contentful-preview-signature.mjs"
 
 assert.deepEqual(getTimelinePreviewConfig("release-123;2026-08-05T10:00:00.000Z"), {
   release: { lte: "release-123" },
@@ -67,6 +73,40 @@ assert.equal(
   addTimelineToPath("/", "release-123;2026-08-05T10:00:00.000Z"),
   "/?timeline=release-123%3B2026-08-05T10%3A00%3A00.000Z"
 )
+assert.equal(
+  addSignedPreviewToPath(
+    "/products/mug",
+    "release-123;2026-08-05T10:00:00.000Z",
+    "signed-value"
+  ),
+  "/products/mug?timeline=release-123%3B2026-08-05T10%3A00%3A00.000Z&previewKey=signed-value"
+)
+
+const previewSignature = createPreviewSignature({
+  path: "/products/mug",
+  timeline: "release-123;2026-08-05T10:00:00.000Z",
+  secret: "test-secret",
+})
+assert.equal(
+  verifyPreviewSignature({
+    path: "/products/mug",
+    timeline: "release-123;2026-08-05T10:00:00.000Z",
+    signature: previewSignature,
+    secret: "test-secret",
+  }),
+  true
+)
+assert.equal(
+  verifyPreviewSignature({
+    path: "/products/another-mug",
+    timeline: "release-123;2026-08-05T10:00:00.000Z",
+    signature: previewSignature,
+    secret: "test-secret",
+  }),
+  false
+)
+assert.equal(normalizeSignedPreviewPath("/de-DE/products/mug?ignored=true"), "/de-DE/products/mug")
+assert.equal(normalizeSignedPreviewPath("//example.com"), null)
 
 const headers = new Map([
   ["Set-Cookie", ["preview=a; SameSite=Lax", "data=b; SameSite=None; Secure"]],

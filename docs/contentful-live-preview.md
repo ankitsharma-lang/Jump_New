@@ -17,7 +17,7 @@ Use the same value for `PREVIEW_SECRET` in Vercel. Keep this variable server-onl
 - **Inspector Mode** makes the headline, section, product image, title, description, price, and slug clickable in the Contentful preview iframe.
 - **Timeline Preview** sends the selected release and/or scheduled time to every Contentful Preview API request. It does not change normal Delivery API traffic.
 
-The preview API validates the Timeline token, stores it in an encrypted, HTTP-only Next.js preview cookie, and retains it in the redirected URL. The homepage then creates a Contentful Preview API client using the SDK's official `timelinePreview` option.
+The preview API validates the Timeline token, stores it in an encrypted, HTTP-only Next.js preview cookie, and retains it in the redirected URL. It also adds a server-signed `previewKey`. If a coworker opens the copied URL without the original cookie, the app validates that signature and securely restores preview mode without exposing the preview secret. The homepage then creates a Contentful Preview API client using the SDK's official `timelinePreview` option.
 
 ## Quick check
 
