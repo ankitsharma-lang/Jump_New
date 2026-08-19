@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react"
 import Link from "next/link"
 import siteLocales from "../config/locales"
+import { formatTimelineTimestamp } from "../lib/contentful-preview.mjs"
 
 const MODE_LABELS = {
   current: "Current drafts",
@@ -214,6 +215,7 @@ export default function PreviewToolbar({ status, workspace }) {
   if (!status?.enabled) return null
 
   const modeLabel = MODE_LABELS[status.mode] || "Preview"
+  const formattedTimestamp = formatTimelineTimestamp(status.timestamp)
 
   return (
     <section className="sticky top-[73px] z-30 border-y border-blue-300/40 bg-blue-950 text-white shadow-lg">
@@ -228,8 +230,8 @@ export default function PreviewToolbar({ status, workspace }) {
         {status.releaseId ? (
           <span className="max-w-52 truncate text-xs text-blue-100">Release: {status.releaseId}</span>
         ) : null}
-        {status.timestamp ? (
-          <span className="text-xs text-blue-100">At: {new Date(status.timestamp).toLocaleString()}</span>
+        {formattedTimestamp ? (
+          <span className="text-xs text-blue-100">At: {formattedTimestamp}</span>
         ) : null}
         <div className="ml-auto flex gap-2">
           <button

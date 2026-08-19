@@ -3,6 +3,7 @@ import {
   addLocaleToPath,
   addSignedPreviewToPath,
   addTimelineToPath,
+  formatTimelineTimestamp,
   getSafePreviewPath,
   getPreviewStatus,
   getTimelinePreviewConfig,
@@ -39,7 +40,13 @@ assert.deepEqual(
   }
 )
 assert.throws(() => getTimelinePreviewConfig("release-123;not-a-date"))
+assert.equal(
+  formatTimelineTimestamp("2026-08-05T10:00:00.000Z"),
+  "2026-08-05 10:00:00 UTC"
+)
+assert.equal(formatTimelineTimestamp("not-a-date"), null)
 assert.equal(getSafePreviewPath("home-page"), "/")
+assert.equal(getSafePreviewPath("home-page-uk-hoodie-variant"), "/")
 assert.equal(getSafePreviewPath("//example.com"), "/")
 assert.equal(
   addLocaleToPath("/", "de-DE", {
