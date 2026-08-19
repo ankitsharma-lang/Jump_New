@@ -1,4 +1,5 @@
 import assert from "node:assert/strict"
+import { readFile } from "node:fs/promises"
 import {
   createContentSnapshot,
   createLocaleCoverage,
@@ -80,6 +81,16 @@ const coverage = createLocaleCoverage(localizedProduct, ["en-US", "de-DE"])
 assert.deepEqual(coverage.find((row) => row.fieldId === "title").availability, {
   "en-US": true,
   "de-DE": true,
+})
+
+const personalizedRouteSources = await Promise.all([
+  readFile(new URL("../pages/index.jsx", import.meta.url), "utf8"),
+  readFile(new URL("../pages/products/[slug].jsx", import.meta.url), "utf8"),
+])
+
+personalizedRouteSources.forEach((source) => {
+  assert.equal(source.includes("useOptimizationContext"), false)
+  assert.equal(source.includes("<OptimizedEntry"), true)
 })
 
 console.log("Storefront feature checks passed")

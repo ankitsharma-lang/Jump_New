@@ -3,7 +3,7 @@ import {
   useContentfulInspectorMode,
   useContentfulLiveUpdates,
 } from "@contentful/live-preview/react"
-import { useOptimizationActions, useOptimizationContext } from "@contentful/optimization-nextjs/client"
+import { useOptimizationActions } from "@contentful/optimization-nextjs/client"
 import _ from "lodash"
 import Head from "next/head"
 import { useRouter } from "next/router"
@@ -123,9 +123,7 @@ const ProductDetails = ({ baselineProduct, product, siteSettings }) => {
 }
 
 const ProductPage = ({ product, siteSettings }) => {
-  const { error } = useOptimizationContext()
-
-  if (!product?.sys?.id || error) {
+  if (!product?.sys?.id) {
     return (
       <ProductDetails
         baselineProduct={product}

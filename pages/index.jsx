@@ -13,7 +13,6 @@ import {
 } from "../lib/helpers"
 import { OptimizedEntry } from "../lib/optimization"
 import { getSiteContent } from "../lib/site-content"
-import { useOptimizationContext } from "@contentful/optimization-nextjs/client"
 import { getPreviewStatus } from "../lib/contentful-preview.mjs"
 import {
   useContentfulLiveUpdates,
@@ -124,9 +123,7 @@ function LandingPage({ baselineEntry, entry, locale = siteLocales.defaultLocale,
 }
 
 export default function Home({ locale, page, siteSettings }) {
-  const { error } = useOptimizationContext()
-
-  if (!page?.sys?.id || error) {
+  if (!page?.sys?.id) {
     return (
       <LandingPage
         baselineEntry={page}
