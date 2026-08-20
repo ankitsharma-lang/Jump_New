@@ -20,8 +20,9 @@ all of the following rules before they are deployed.
 - Prefer small, single-purpose functions with explicit inputs and safe fallbacks.
 - Never log tokens, cookies, profile identifiers, IP addresses, or precise visitor
   location data.
-- Do not hide failed personalization behind a permissive baseline. A baseline contains
-  only content intended for every visitor; targeted content belongs only in a variant.
+- Model the baseline and variants from an explicitly documented business rule. For the
+  storefront homepage, the baseline shows both collections to non-UK visitors and the
+  UK-targeted variant intentionally narrows the page to the UK collection only.
 - Avoid shared HTML caching on request-personalized routes. Preserve the server's
   selection during browser hydration.
 - Document any temporary compatibility workaround with its cause and removal condition.

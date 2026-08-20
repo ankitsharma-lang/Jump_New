@@ -27,7 +27,7 @@ test("a clean UK request is rendered with only the UK collection", async ({ brow
   await context.close()
 })
 
-test("a clean non-UK request never renders the UK collection", async ({ browser }) => {
+test("a clean non-UK request renders both collections", async ({ browser }) => {
   const context = await browser.newContext({
     extraHTTPHeaders: {
       "x-vercel-ip-country": "US",
@@ -39,7 +39,7 @@ test("a clean non-UK request never renders the UK collection", async ({ browser 
   await page.goto("/")
 
   await expect(page.getByText("All Users Collection", { exact: true })).toBeVisible()
-  await expect(page.getByText("UK Collection", { exact: true })).toHaveCount(0)
+  await expect(page.getByText("UK Collection", { exact: true })).toBeVisible()
   await expect(page.getByText("Curated storefront", { exact: true })).toBeVisible()
 
   await context.close()

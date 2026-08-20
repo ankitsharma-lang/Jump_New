@@ -31,7 +31,7 @@ Every product details page contains **Image delivery controls**. They build a re
 
 ## Public personalization
 
-The home page, product sections, product cards, and product details keep application-fetched Contentful entries as `baselineEntry` values. Contentful Optimization resolves variants in the browser while preserving ISR output and baseline fallback. Product cards track views, clicks, and hovers; the product action sends an `add_to_cart` event.
+The home page, product sections, product cards, and product details keep application-fetched Contentful entries as `baselineEntry` values. Personalized routes are rendered per request, and the browser preserves the server's Contentful Optimization selection during hydration. The homepage baseline shows both collections to non-UK visitors; the UK-targeted variant shows only the UK collection. Product cards track views, clicks, and hovers; the product action sends an `add_to_cart` event.
 
 ## Secure webhook revalidation
 
